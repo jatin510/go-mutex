@@ -29,7 +29,7 @@ func startGameLoop(p *Player) {
 	ticker := time.NewTicker(time.Millisecond * 300)
 
 	for {
-		p.health -= rand.Intn(20)
+		p.health -= rand.Intn(40)
 		if p.health <= 0 {
 			fmt.Println("GAME OVER")
 			break
