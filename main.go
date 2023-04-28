@@ -18,15 +18,26 @@ func NewPlayer() *Player {
 	}
 }
 
+func (p *Player) getHealth() int {
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+
+	return p.health
+}
+
+func (p *Player) takeDamage(damage int) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	p.health -= damage
+}
+
 func startUILoop(p *Player) {
 	ticker := time.NewTicker(time.Second)
 
 	for {
-		p.mu.RLock()
+		fmt.Printf("player health: %d\r", p.getHealth())
 
-		fmt.Printf("player health: %d\r", p.health)
-
-		p.mu.RUnlock()
 		<-ticker.C
 	}
 }
@@ -35,15 +46,12 @@ func startGameLoop(p *Player) {
 	ticker := time.NewTicker(time.Millisecond * 300)
 
 	for {
-		p.mu.Lock()
-
-		p.health -= rand.Intn(40)
-		if p.health <= 0 {
+		p.takeDamage(rand.Intn(30))
+		if p.getHealth() <= 0 {
 			fmt.Println("GAME OVER")
 			break
 		}
 
-		p.mu.Unlock()
 		<-ticker.C
 	}
 }
